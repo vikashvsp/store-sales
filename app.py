@@ -1,8 +1,7 @@
-
-from pyexpat import model
 from flask import Flask,request,render_template
 import pandas as pd
 import pickle
+import os
 
 app=Flask(__name__)
 file=open("./XGBoost_model.pkl",'rb')
@@ -40,4 +39,5 @@ def predict():
      return str(prediction[0])
 
 if __name__=='__main__':
-     app.run(debug=True)
+     port = int(os.environ.get('PORT', 5000))
+     app.run(debug=True, host='0.0.0.0', port=port)
