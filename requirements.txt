@@ -11,6 +11,7 @@ gunicorn==20.0.4
 Flask==2.0.1
 gevent==21.8.0
 greenlet==1.1.1
+gunicorn
 ipykernel==5.5.5
 ipython==7.23.1
 ipython-genutils==0.2.0
