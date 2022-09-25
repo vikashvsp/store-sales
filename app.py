@@ -36,7 +36,7 @@ def predict():
      Item_MRP, Outlet_Size, Outlet_Location_Type, Outlet_Type, Outlet_Establishment_Year]], columns=['Item_Weight', 
      'Item_Fat_Content', 'Item_Visibility', 'Item_Type',
      'Item_MRP', 'Outlet_Size', 'Outlet_Location_Type', 'Outlet_Type', 'Outlet_Establishment_Year']))
-     print(str(prediction[0]))
+     #print(str(prediction[0]))
      return str(prediction[0])
 
 if __name__=='__main__':

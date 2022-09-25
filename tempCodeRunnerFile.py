@@ -1,1 +1,0 @@
-print(str(prediction[0]))
