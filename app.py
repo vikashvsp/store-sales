@@ -4,7 +4,7 @@ import pickle
 import os
 
 app=Flask(__name__)
-file=open("./XGBoost_model.pkl",'rb')
+file=open("./rf_clf.pkl",'rb')
 model=pickle.load(file)
 
 data=pd.read_csv('./cleaned_data.csv')
