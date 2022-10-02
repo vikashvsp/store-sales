@@ -1,19 +1,21 @@
-# start by pulling the python image
-FROM python:3.10-buster
+FROM python:3.8.10-slim as compiler
+ENV PYTHONUNBUFFERED 1
 
-# copy the requirements file into the image
-COPY . /app
-WORKDIR /app
+WORKDIR /app/
 
-#COPY ./requirements.txt /app/requirements.txt
+RUN python -m venv /opt/venv
+# Enable venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# # switch working directory
+COPY ./requirements.txt /app/requirements.txt
+RUN pip install -Ur requirements.txt
 
-# # install the dependencies and packages in the requirements file
-# RUN pip install -r requirements.txt
+FROM python:3.8.10-slim as runner
+WORKDIR /app/
+COPY --from=compiler /opt/venv /opt/venv
 
-# # copy every content from the local file to the image
+# Enable venv
+ENV PATH="/opt/venv/bin:$PATH"
+COPY . /app/
 
-# # configure the container to run in an executed manner
-
-# CMD ["python","app.py" ]
+RUN python app.py

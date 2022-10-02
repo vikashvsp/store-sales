@@ -1,42 +1,44 @@
-from flask import Flask,request,render_template
-import pandas as pd
-import pickle
-import os
+import logging
 
-app=Flask(__name__)
-file=open("./rf_clf.pkl",'rb')
-model=pickle.load(file)
+from flask import Flask, request, render_template
 
-data=pd.read_csv('./cleaned_data.csv')
+from utils.utils import read_request_data, read_csv_file
+from model.inference import predict_model
+
+app = Flask(__name__)
+logging.basicConfig(format='%(asctime)s-%(levelname)s- %(message)s ', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
+
 
 @app.route('/')
 def home():
-     Item_Fat_Content=sorted(data['Item_Fat_Content'].unique())
-     Item_Type=sorted(data['Item_Type'].unique())
-     Outlet_Size=sorted(data['Outlet_Size'].unique())
-     Outlet_Location_Type=sorted(data['Outlet_Location_Type'].unique())
-     Outlet_Type=sorted(data['Outlet_Type'].unique())
+    """
+    #TODO: Explain what this function does
+    """
+    sales_data = read_csv_file('cleaned_data.csv')
+    logging.debug(f'CSV Data Loaded {sales_data}')
 
-     return render_template("index.html", Item_Fat_Content= Item_Fat_Content, Item_Type= Item_Type, Outlet_Size=Outlet_Size,
-     Outlet_Location_Type= Outlet_Location_Type, Outlet_Type=Outlet_Type)
-@app.route('/predict',methods=['POST'])
+    Item_Fat_Content = sorted(sales_data['Item_Fat_Content'].unique())
+    Item_Type = sorted(sales_data['Item_Type'].unique())
+    Outlet_Size = sorted(sales_data['Outlet_Size'].unique())
+    Outlet_Location_Type = sorted(sales_data['Outlet_Location_Type'].unique())
+    Outlet_Type = sorted(sales_data['Outlet_Type'].unique())
+
+    return render_template("index.html", Item_Fat_Content=Item_Fat_Content, Item_Type=Item_Type,
+                           Outlet_Size=Outlet_Size,
+                           Outlet_Location_Type=Outlet_Location_Type, Outlet_Type=Outlet_Type)
+
+
+@app.route('/predict', methods=['POST'])
 def predict():
-     Item_Weight=float(request.form.get('Item_Weight'))
-     Item_Fat_Content = request.form.get('Item_Fat_Content')
-     Item_Visibility = request.form.get('Item_Visibility')
-     Item_Type = request.form.get('Item_Type')
-     Item_MRP = request.form.get('Item_MRP')
-     Outlet_Size = request.form.get('Outlet_Size')
-     Outlet_Location_Type = request.form.get('Outlet_Location_Type')
-     Outlet_Type = request.form.get('Outlet_Type')
-     Outlet_Establishment_Year = request.form.get('Outlet_Establishment_Year')
+    """
+    This function returns the predicted data back to the webpage.
+    """
+    sales_data = read_request_data(request=request)
+    prediction = predict_model(sales_data)
+    logging.info(f'Predictions Made By Model {prediction}')
 
-     prediction = model.predict(pd.DataFrame([[Item_Weight, Item_Fat_Content, Item_Visibility, Item_Type,
-     Item_MRP, Outlet_Size, Outlet_Location_Type, Outlet_Type, Outlet_Establishment_Year]], columns=['Item_Weight', 
-     'Item_Fat_Content', 'Item_Visibility', 'Item_Type',
-     'Item_MRP', 'Outlet_Size', 'Outlet_Location_Type', 'Outlet_Type', 'Outlet_Establishment_Year']))
-     #print(str(prediction[0]))
-     return str(prediction[0])
+    return str(prediction[0])
 
-if __name__=='__main__':
-     app.run(debug=True)
+
+if __name__ == '__main__':
+    app.run(debug=False)
